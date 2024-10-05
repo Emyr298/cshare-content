@@ -22,17 +22,17 @@ public interface ContentRepository extends ReactiveSortingRepository<Content, UU
     @Query("""
             SELECT * FROM content
             WHERE user_id = :userId
-                    AND status = :status
+                    AND status = :status::content_status
                     AND (published_at BETWEEN :from AND :to)
             LIMIT :limit
         """)
     Flux<Content> findByUserIdAndStatusAndPublishedAtBetweenLimit(
-        String userId,
+        UUID userId,
         ContentStatus status,
         LocalDateTime from,
         LocalDateTime to,
         Integer limit
     );
 
-    Flux<Content> findByUserIdAndStatusOrderByCreatedAt(String userId, ContentStatus status, Pageable pageable);
+    Flux<Content> findByUserIdAndStatusOrderByCreatedAt(UUID userId, ContentStatus status, Pageable pageable);
 }
