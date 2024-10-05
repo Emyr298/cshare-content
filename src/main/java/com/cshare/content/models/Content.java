@@ -1,5 +1,6 @@
 package com.cshare.content.models;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
@@ -26,4 +27,13 @@ public class Content {
     
     @Column("status")
     private ContentStatus status = ContentStatus.DRAFT;
+
+    @Column("created_at")
+    private LocalDateTime createdAt;
+
+    @Column("updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column("published_at")
+    private LocalDateTime publishedAt;
 }
