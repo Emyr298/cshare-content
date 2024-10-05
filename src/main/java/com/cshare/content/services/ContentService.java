@@ -4,15 +4,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.cshare.content.exceptions.NotFoundException;
+import com.cshare.content.exceptions.PermissionException;
 import com.cshare.content.models.Content;
 import com.cshare.content.models.ContentStatus;
 import com.cshare.content.repositories.ContentRepository;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -36,5 +38,17 @@ public class ContentService {
 
     public Flux<Content> findDrafts(String userId) {
         return contentRepository.findByUserIdAndStatusOrderByUpdatedAt(UUID.fromString(userId), ContentStatus.DRAFT);
+    }
+
+    public Mono<Content> getContent(String curUserId, String contentId) {
+        return contentRepository
+            .findById(UUID.fromString(contentId))
+            .switchIfEmpty(Mono.error(new NotFoundException("Content with id " + contentId + " is not available")))
+            .filter(
+                content -> 
+                    content.getStatus().equals(ContentStatus.PUBLISHED) 
+                    || content.getUserId().equals(UUID.fromString(curUserId))
+            )
+            .switchIfEmpty(Mono.error(new PermissionException("User is not the owner of content " + contentId)));
     }
 }

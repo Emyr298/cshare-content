@@ -13,6 +13,7 @@ import com.cshare.content.services.ContentService;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/content")
@@ -20,7 +21,7 @@ import reactor.core.publisher.Flux;
 public class ContentController {
     private final ContentService contentService;
     
-    @GetMapping("/{userId}")
+    @GetMapping("/users/{userId}")
     public Flux<Content> getContentByUser(
         @PathVariable String userId,
         @RequestParam(required = false) LocalDateTime fromTime,
@@ -29,10 +30,18 @@ public class ContentController {
         return contentService.findContentByUser(userId, fromTime, toTime);
     }
 
-    @GetMapping("/{userId}/drafts")
+    @GetMapping("/drafts")
     public Flux<Content> getDrafts(
-        @PathVariable String userId
+        @RequestParam String userId
     ) {
         return contentService.findDrafts(userId);
+    }
+
+    @GetMapping("/{contentId}")
+    public Mono<Content> getContent(
+        @PathVariable String contentId,
+        @RequestParam String userId
+    ) {
+        return contentService.getContent(userId, contentId);
     }
 }

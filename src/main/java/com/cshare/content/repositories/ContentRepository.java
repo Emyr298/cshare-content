@@ -3,8 +3,6 @@ package com.cshare.content.repositories;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 
