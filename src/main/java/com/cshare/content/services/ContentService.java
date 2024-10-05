@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.cshare.content.models.Content;
@@ -31,5 +32,9 @@ public class ContentService {
                 to,
                 CONTENT_LIMIT
             );
+    }
+
+    public Flux<Content> findDrafts(String userId) {
+        return contentRepository.findByUserIdAndStatusOrderByUpdatedAt(UUID.fromString(userId), ContentStatus.DRAFT);
     }
 }

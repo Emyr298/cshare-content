@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 
@@ -34,5 +35,11 @@ public interface ContentRepository extends ReactiveSortingRepository<Content, UU
         Integer limit
     );
 
-    Flux<Content> findByUserIdAndStatusOrderByCreatedAt(UUID userId, ContentStatus status, Pageable pageable);
+    @Query("""
+            SELECT * FROM content
+            WHERE user_id = :userId
+                    AND status = :status::content_status
+            ORDER BY updated_at DESC
+        """)
+    Flux<Content> findByUserIdAndStatusOrderByUpdatedAt(UUID userId, ContentStatus status);
 }

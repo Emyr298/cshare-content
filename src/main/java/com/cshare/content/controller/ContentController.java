@@ -28,4 +28,11 @@ public class ContentController {
     ) {
         return contentService.findContentByUser(userId, fromTime, toTime);
     }
+
+    @GetMapping("/{userId}/drafts")
+    public Flux<Content> getDrafts(
+        @PathVariable String userId
+    ) {
+        return contentService.findDrafts(userId);
+    }
 }
