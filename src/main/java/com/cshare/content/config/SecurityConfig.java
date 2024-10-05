@@ -2,23 +2,20 @@ package com.cshare.content.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
-@RequiredArgsConstructor
+@EnableReactiveMethodSecurity
+@EnableWebFluxSecurity
 public class SecurityConfig {
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+        return http
+            .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
             .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests
-                .anyRequest()
-                .permitAll()
-            );
-        return http.build();
+            .build();
     }
 }

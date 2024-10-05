@@ -1,5 +1,6 @@
 package com.cshare.content.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,6 +16,7 @@ import reactor.core.publisher.Flux;
 public class ContentController {
     private final ContentService contentService;
     
+    @GetMapping("/")
     public Flux<Content> getContentByUser() {
         return contentService.findContentByUser("2");
     }
