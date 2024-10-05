@@ -26,7 +26,7 @@ public class ContentService {
         return contentRepository
             .findByUserIdAndStatusAndPublishedAtBetweenLimit(
                 UUID.fromString(userId),
-                ContentStatus.DRAFT,
+                ContentStatus.PUBLISHED,
                 from,
                 to,
                 CONTENT_LIMIT
