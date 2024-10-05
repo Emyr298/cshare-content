@@ -1,5 +1,7 @@
 package com.cshare.content.services;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import com.cshare.content.models.Content;
@@ -14,6 +16,6 @@ public class ContentService {
     private final ContentRepository contentRepository;
     
     public Flux<Content> findContentByUser(String userId) {
-        return contentRepository.findByUserId(userId);
+        return contentRepository.findByUserId(UUID.fromString(userId));
     }
 }

@@ -18,6 +18,6 @@ public class ContentController {
     
     @GetMapping("/")
     public Flux<Content> getContentByUser() {
-        return contentService.findContentByUser("2");
+        return contentService.findContentByUser("d6cfe0a5-98e8-4c65-b17e-ec825a94c930");
     }
 }

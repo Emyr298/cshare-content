@@ -1,5 +1,7 @@
 package com.cshare.content.models;
 
+import java.util.UUID;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 
@@ -11,7 +13,7 @@ import lombok.Data;
 public class Content {
     @Id
     @Column("id")
-    private String id;
+    private UUID id;
     
     @Column("title")
     private String title;
@@ -20,7 +22,7 @@ public class Content {
     private String description;
     
     @Column("user_id")
-    private String userId;
+    private UUID userId;
     
     @Column("status")
     private ContentStatus status = ContentStatus.DRAFT;
