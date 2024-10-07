@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.cshare.content.dto.CreateContentDto;
 import com.cshare.content.exceptions.NotFoundException;
 import com.cshare.content.exceptions.PermissionException;
 import com.cshare.content.models.Content;
@@ -50,5 +51,20 @@ public class ContentService {
                     || content.getUserId().equals(UUID.fromString(curUserId))
             )
             .switchIfEmpty(Mono.error(new PermissionException("User is not the owner of content " + contentId)));
+    }
+
+    public Mono<Content> createContent(String userId, CreateContentDto data) {
+        LocalDateTime curTime = LocalDateTime.now();
+        var contentBuilder = Content.builder()
+            .title(data.getTitle())
+            .description(data.getDescription())
+            .status(data.getStatus())
+            .userId(UUID.fromString(userId))
+            .createdAt(curTime)
+            .updatedAt(curTime);
+        if (data.getStatus().equals(ContentStatus.PUBLISHED)) {
+            contentBuilder = contentBuilder.publishedAt(curTime);
+        }
+        return contentRepository.save(contentBuilder.build());
     }
 }

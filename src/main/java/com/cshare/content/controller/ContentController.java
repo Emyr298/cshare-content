@@ -4,13 +4,17 @@ import java.time.LocalDateTime;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cshare.content.dto.CreateContentDto;
 import com.cshare.content.models.Content;
 import com.cshare.content.services.ContentService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -43,5 +47,14 @@ public class ContentController {
         @RequestParam String userId
     ) {
         return contentService.getContent(userId, contentId);
+    }
+
+    @PostMapping("/")
+    public Mono<Content> createContent(
+        @Valid @RequestBody CreateContentDto payload,
+        @RequestParam String userId
+    ) {
+        System.out.println(payload);
+        return contentService.createContent(userId, payload);
     }
 }
