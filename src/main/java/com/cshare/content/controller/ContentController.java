@@ -54,7 +54,6 @@ public class ContentController {
         @Valid @RequestBody CreateContentDto payload,
         @RequestParam String userId
     ) {
-        System.out.println(payload);
         return contentService.createContent(userId, payload);
     }
 }

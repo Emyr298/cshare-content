@@ -46,7 +46,6 @@ public class GlobalExceptionHandler extends ResponseStatusExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ErrorDto>> handleGenericException(Exception ex, ServerWebExchange exchange) {
-        System.out.println(ex.getMessage());
         return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorDto("Internal Server Error")));
     }
 }
