@@ -16,6 +16,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuples;
 
 @Service
@@ -39,29 +40,41 @@ public class ContentResourceService {
 
     public Mono<ContentResource> createResource(String userId, String contentId, Mono<FilePart> fileMono) {
         Mono<Content> contentCheck = contentService.getContentOfUser(userId, contentId);
-        Mono<ContentResource> fileProcessing = fileMono
+        var fileProcessing = fileMono
             .flatMap(filePart -> 
-                saveTempFile(filePart)
-                    .map(path -> Tuples.of(filePart, path)))
-            .flatMap(pair -> {
-                    return fileStorage.uploadFile(
-                        pair.getT1().filename().replaceAll("[^A-Za-z0-9]", ""),
-                        pair.getT2().toFile()
-                    );
-                }
-            ).flatMap(url -> {
+                saveTempFile(filePart))
+            .flatMap(path -> fileStorage.uploadFile(
+                        UUID.randomUUID().toString(),
+                        path.toFile()
+                    ).map(url -> Tuples.of(url, path))
+            ).flatMap(pair -> {
                 ContentResource resource = ContentResource.builder()
                     .contentId(UUID.fromString(contentId))
-                    .url(url.toString())
+                    .url(pair.getT1().toString())
                     .build();
-                return repository.save(resource);
+                return repository.save(resource)
+                    .map(resourceDB -> Tuples.of(resourceDB, pair.getT2()));
             });
-        return contentCheck.then(fileProcessing);
+            
+        return contentCheck
+            .then(fileProcessing)
+            .doOnSuccess(pair -> {
+                deleteTempFile(pair.getT2())
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .subscribe();
+            })
+            .map(pair -> pair.getT1());
     }
 
     private Mono<Path> saveTempFile(FilePart filePart) {
         String uuid = UUID.randomUUID().toString();
         Path path = Paths.get(tempFilePath, uuid);
         return filePart.transferTo(path).then(Mono.just(path));
+    }
+
+    private Mono<Void> deleteTempFile(Path path) {
+        return Mono.fromRunnable(() -> {
+            path.toFile().delete();
+        });
     }
 }
