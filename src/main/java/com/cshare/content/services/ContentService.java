@@ -53,9 +53,11 @@ public class ContentService {
             .switchIfEmpty(Mono.error(new PermissionException("User is not the owner of content " + contentId)));
     }
 
-    public Mono<Content> getContentUnrestricted(String contentId) {
+    public Mono<Content> getContentOfUser(String userId, String contentId) {
         return contentRepository.findById(UUID.fromString(contentId))
-            .switchIfEmpty(Mono.error(new NotFoundException("Content with id " + contentId + " is not available")));
+            .switchIfEmpty(Mono.error(new NotFoundException("Content with id " + contentId + " is not available")))
+            .filter(content -> content.getUserId().toString().equals(userId))
+            .switchIfEmpty(Mono.error(new PermissionException("User is not the owner of content " + contentId)));
     }
 
     public Mono<Content> createContent(String userId, CreateContentDto data) {
