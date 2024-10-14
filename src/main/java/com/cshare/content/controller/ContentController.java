@@ -62,6 +62,14 @@ public class ContentController {
         return contentService.createContent(userId, payload);
     }
 
+    @GetMapping("/{contentId}/resources")
+    public Flux<ContentResource> getResources(
+        @RequestParam String userId,
+        @PathVariable String contentId
+    ) {
+        return contentResourceService.getResources(userId, contentId);
+    }
+
     @PostMapping("/{contentId}/resources")
     public Mono<ContentResource> uploadResource(
         @RequestParam String userId,

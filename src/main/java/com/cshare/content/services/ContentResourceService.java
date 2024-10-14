@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 
@@ -30,10 +31,10 @@ public class ContentResourceService {
     @Value("${cshare.content.bucket-path}")
     private String bucketPath;
 
-    private Mono<Path> saveTempFile(FilePart filePart) {
-        String uuid = UUID.randomUUID().toString();
-        Path path = Paths.get(tempFilePath, uuid);
-        return filePart.transferTo(path).then(Mono.just(path));
+    public Flux<ContentResource> getResources(String userId, String contentId) {
+        Mono<Content> contentCheck = contentService.getContentOfUser(userId, contentId);
+        Flux<ContentResource> resources = repository.findByContentId(UUID.fromString(contentId));
+        return contentCheck.thenMany(resources);
     }
 
     public Mono<ContentResource> createResource(String userId, String contentId, Mono<FilePart> fileMono) {
@@ -56,5 +57,11 @@ public class ContentResourceService {
                 return repository.save(resource);
             });
         return contentCheck.then(fileProcessing);
+    }
+
+    private Mono<Path> saveTempFile(FilePart filePart) {
+        String uuid = UUID.randomUUID().toString();
+        Path path = Paths.get(tempFilePath, uuid);
+        return filePart.transferTo(path).then(Mono.just(path));
     }
 }

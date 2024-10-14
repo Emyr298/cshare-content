@@ -1,6 +1,6 @@
 package com.cshare.content.repositories;
 
-import org.hibernate.validator.constraints.UUID;
+import java.util.UUID;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 
 import com.cshare.content.models.ContentResource;
