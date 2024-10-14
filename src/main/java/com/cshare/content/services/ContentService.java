@@ -53,6 +53,11 @@ public class ContentService {
             .switchIfEmpty(Mono.error(new PermissionException("User is not the owner of content " + contentId)));
     }
 
+    public Mono<Content> getContentUnrestricted(String contentId) {
+        return contentRepository.findById(UUID.fromString(contentId))
+            .switchIfEmpty(Mono.error(new NotFoundException("Content with id " + contentId + " is not available")));
+    }
+
     public Mono<Content> createContent(String userId, CreateContentDto data) {
         LocalDateTime curTime = LocalDateTime.now();
         var contentBuilder = Content.builder()

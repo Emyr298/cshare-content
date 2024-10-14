@@ -5,6 +5,8 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.cshare.content.core.storage.FileStorage;
+import com.cshare.content.exceptions.PermissionException;
+import com.cshare.content.models.Content;
 import com.cshare.content.models.ContentResource;
 import com.cshare.content.repositories.ContentResourceRepository;
 
@@ -19,6 +21,7 @@ import reactor.util.function.Tuples;
 @Service
 @RequiredArgsConstructor
 public class ContentResourceService {
+    private final ContentService contentService;
     private final ContentResourceRepository repository;
     private final FileStorage fileStorage;
 
@@ -35,7 +38,10 @@ public class ContentResourceService {
     }
 
     public Mono<ContentResource> createResource(String userId, String contentId, Mono<FilePart> fileMono) {
-        return fileMono
+        Mono<Content> contentCheck = contentService.getContentUnrestricted(contentId)
+            .filter(content -> content.getUserId().toString().equals(userId))
+            .switchIfEmpty(Mono.error(new PermissionException("User is not the owner of content " + contentId)));
+        Mono<ContentResource> fileProcessing = fileMono
             .flatMap(filePart -> 
                 saveTempFile(filePart)
                     .map(path -> Tuples.of(filePart, path)))
@@ -52,5 +58,6 @@ public class ContentResourceService {
                     .build();
                 return repository.save(resource);
             });
+        return contentCheck.then(fileProcessing);
     }
 }
