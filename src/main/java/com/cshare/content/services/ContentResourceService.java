@@ -33,7 +33,7 @@ public class ContentResourceService {
     private String bucketPath;
 
     public Flux<ContentResource> getResources(String userId, String contentId) {
-        Mono<Content> contentCheck = contentService.getContentOfUser(userId, contentId);
+        Mono<Content> contentCheck = contentService.getContent(userId, contentId);
         Flux<ContentResource> resources = repository.findByContentId(UUID.fromString(contentId));
         return contentCheck.thenMany(resources);
     }
